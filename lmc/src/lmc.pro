@@ -12,6 +12,7 @@ macx: QT += multimedia
 win32: TARGET = lmc
 unix: TARGET = lan-messenger
 macx: TARGET  = "LAN-Messenger"
+
 TEMPLATE = app
 
 RESOURCES = resource.qrc
@@ -133,10 +134,10 @@ TRANSLATIONS += \
 	ro_RO.ts \
 	ar_SA.ts \
 	sl_SI.ts \
-        pt_BR.ts \
-        ru_RU.ts \
-        it_IT.ts \
-        sv_SE.ts
+    pt_BR.ts \
+    ru_RU.ts \
+    it_IT.ts \
+    sv_SE.ts
 
 win32: RC_FILE = lmcwin32.rc
 macx: ICON = lmc.icns
@@ -167,9 +168,20 @@ unix:!symbian: {
 INCLUDEPATH += $$PWD/../../lmcapp/include
 DEPENDPATH += $$PWD/../../lmcapp/include
 
-win32-msvc*: LIBS += advapi32.lib # for GetUserNameW(...) in Helper::getLogonName(..)
-win32: LIBS += -L$$PWD/../../openssl/lib/ -llibeay32
-unix:!symbian: LIBS += -L$$PWD/../../openssl/lib/ -lcrypto
+isEmpty(openssl_dir) {
+    openssl_dir=$$(openssl_dir)
+    isEmpty(openssl_dir) {
+        openssl_dir=$$PWD/../../openssl
+    }
+}
 
-INCLUDEPATH += $$PWD/../../openssl/include
-DEPENDPATH += $$PWD/../../openssl/include
+!exists($$openssl_dir) {
+    message("Please set openssl_dir to openssl install directory")
+}
+
+win32-msvc*: LIBS += advapi32.lib # for GetUserNameW(...) in Helper::getLogonName(..)
+win32: LIBS += -L$$openssl_dir/lib/ -llibeay32
+unix:!symbian: LIBS += -L$$openssl_dir/lib/ -lcrypto
+
+INCLUDEPATH += $$openssl_dir/include
+DEPENDPATH += $$openssl_dir/include
